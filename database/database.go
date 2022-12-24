@@ -3,18 +3,11 @@ package database
 import (
 	"fmt"
 	"log"
+	"os"
 	"todo-list/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-)
-
-const (
-	MYSQL_HOST     = "localhost"
-	MYSQL_PORT     = "3306"
-	MYSQL_USER     = "root"
-	MYSQL_PASSWORD = "hasan123"
-	MYSQL_DATABASE = "todoapp"
 )
 
 var (
@@ -23,8 +16,13 @@ var (
 )
 
 func StartDB() {
+	MYSQL_PORT := os.Getenv("MYSQL_PORT")
+	if MYSQL_PORT == "" {
+		MYSQL_PORT = "3306"
+	}
+
 	config := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		MYSQL_USER, MYSQL_PASSWORD, MYSQL_HOST, MYSQL_PORT, MYSQL_DATABASE)
+		os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_HOST"), MYSQL_PORT, os.Getenv("MYSQL_DBNAME"))
 
 	db, err = gorm.Open(mysql.Open(config), &gorm.Config{})
 	if err != nil {
