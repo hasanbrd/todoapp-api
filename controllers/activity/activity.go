@@ -10,9 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type emptyStruct struct{}
+
+var emptyData emptyStruct
+
 const (
 	successMessage = "Success"
-	emptyData      = "{}"
 	notFound       = "Not Found"
 	badRequest     = "Bad Request"
 	cannotNull     = "cannot be null"

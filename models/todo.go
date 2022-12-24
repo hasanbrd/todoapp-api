@@ -6,9 +6,9 @@ import (
 	"gorm.io/gorm"
 )
 
-type ToDo struct {
+type Todo struct {
 	ID         uint           `gorm:"primaryKey" json:"id"`
-	ActivityID uint           `gorm:"not null" json:"activity_group_id"`
+	ActivityID uint           `gorm:"not null;column:activity_group_id" json:"activity_group_id"`
 	Title      string         `gorm:"not null" json:"title"`
 	IsActive   bool           `json:"is_active"`
 	Priority   string         `json:"priority"`

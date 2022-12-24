@@ -10,9 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type emptyStruct struct{}
+
+var emptyData emptyStruct
+
 const (
 	successMessage = "Success"
-	emptyData      = "{}"
 	notFound       = "Not Found"
 	badRequest     = "Bad Request"
 	cannotNull     = "cannot be null"
@@ -20,7 +23,7 @@ const (
 
 func CreateTodo(ctx *gin.Context) {
 	db := database.GetDB()
-	todo := models.ToDo{}
+	todo := models.Todo{}
 
 	err := ctx.ShouldBindJSON(&todo)
 	if err != nil {
@@ -46,6 +49,8 @@ func CreateTodo(ctx *gin.Context) {
 		return
 	}
 
+	todo.IsActive = true
+	todo.Priority = "very-high"
 	err = db.Create(&todo).Error
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, resultResponse{
@@ -68,7 +73,7 @@ func CreateTodo(ctx *gin.Context) {
 
 func GetTodoByID(ctx *gin.Context) {
 	db := database.GetDB()
-	todo := models.ToDo{}
+	todo := models.Todo{}
 	todoID := ctx.Param("id")
 
 	err := db.First(&todo, todoID).Error
@@ -88,7 +93,7 @@ func GetTodoByID(ctx *gin.Context) {
 
 func GetAllTodo(ctx *gin.Context) {
 	db := database.GetDB()
-	todo := []models.ToDo{}
+	todo := []models.Todo{}
 
 	err := db.Find(&todo).Error
 	if err != nil {
@@ -105,8 +110,8 @@ func GetAllTodo(ctx *gin.Context) {
 
 func UpdateTodo(ctx *gin.Context) {
 	db := database.GetDB()
-	todo := models.ToDo{}
-	requestBody := models.ToDo{}
+	todo := models.Todo{}
+	requestBody := models.Todo{}
 	todoID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)
@@ -130,21 +135,17 @@ func UpdateTodo(ctx *gin.Context) {
 		return
 	}
 
-	if requestBody.Title == "" {
-		requestBody.Title = todo.Title
+	if requestBody.Title != "" {
+		todo.Title = requestBody.Title
 	}
 
-	if !requestBody.IsActive {
-		requestBody.IsActive = todo.IsActive
+	if requestBody.Priority != "" {
+		todo.Priority = requestBody.Priority
 	}
 
-	if requestBody.Priority == "" {
-		requestBody.Priority = todo.Priority
+	if requestBody.IsActive != todo.IsActive {
+		todo.IsActive = requestBody.IsActive
 	}
-
-	todo.Title = requestBody.Title
-	todo.IsActive = requestBody.IsActive
-	todo.Priority = requestBody.Priority
 
 	err = db.Save(&todo).Error
 	if err != nil {
@@ -159,7 +160,7 @@ func UpdateTodo(ctx *gin.Context) {
 
 func DeleteTodo(ctx *gin.Context) {
 	db := database.GetDB()
-	todo := models.ToDo{}
+	todo := models.Todo{}
 	todoID, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, err)

@@ -29,7 +29,7 @@ func StartDB() {
 		log.Fatal("error connection to db:", err)
 	}
 
-	db.Debug().AutoMigrate(models.ToDo{}, models.Activity{})
+	db.Debug().AutoMigrate(models.Todo{}, models.Activity{})
 }
 
 func GetDB() *gorm.DB {
