@@ -94,8 +94,9 @@ func GetTodoByID(ctx *gin.Context) {
 func GetAllTodo(ctx *gin.Context) {
 	db := database.GetDB()
 	todo := []models.Todo{}
+	param := ctx.Query("activity_group_id")
 
-	err := db.Find(&todo).Error
+	err := db.Find(&todo, "activity_group_id = ?", param).Error
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, resultResponse{
 			badRequest, err.Error(), emptyData,
